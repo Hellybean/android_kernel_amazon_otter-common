@@ -1,10 +1,6 @@
 VERSION = 3
 PATCHLEVEL = 0
-<<<<<<< HEAD
-SUBLEVEL = 92
-=======
 SUBLEVEL = 93
->>>>>>> v3.0.93
 EXTRAVERSION =
 NAME = Sneaky Weasel
 

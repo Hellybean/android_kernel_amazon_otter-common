@@ -91,6 +91,20 @@ config CGROUP_BFQIO
 	  filesystem interface.  The name of the subsystem will be
 	  bfqio.
 
+config IOSCHED_ZEN
+	tristate "Zen I/O scheduler"
+	default y
+	---help---
+	  FCFS, dispatches are back-inserted, deadlines ensure fairness.
+	  Should work best with devices where there is no travel delay.
+	  Enable group IO scheduling in CFQ.
+
+config IOSCHED_FIFO
+ 	 bool
+ 	 default y
+ 	 ---help---
+ 	 Fifo is similar to no-op I/O scheduler and it's a minimal scheduler that does basic merging and sorting.
+
 choice
 	prompt "Default I/O scheduler"
 	default DEFAULT_CFQ
@@ -115,6 +129,12 @@ choice
 
 	config DEFAULT_NOOP
 		bool "No-op"
+		
+	config DEFAULT_ZEN
+		bool "ZEN" if IOSCHED_ZEN=y
+
+        config DEFAULT_FIFO
+                bool "fifo"
 
 endchoice
 
@@ -126,6 +146,9 @@ config DEFAULT_IOSCHED
 	default "vr" if DEFAULT_VR
 	default "bfq" if DEFAULT_BFQ
 	default "noop" if DEFAULT_NOOP
+	default "zen" if DEFAULT_ZEN
+        default "fifo" if DEFAULT_FIFO
+
 
 endmenu
 

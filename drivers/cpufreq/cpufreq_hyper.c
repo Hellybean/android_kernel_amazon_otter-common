@@ -1,5 +1,5 @@
 /*
- *  drivers/cpufreq/cpufreq_HYPER.c
+ *  drivers/cpufreq/cpufreq_hyper.c
  *
  *  Copyright (C)  2001 Russell King
  *            (C)  2003 Venkatesh Pallipadi <venkatesh.pallipadi@intel.com>.
@@ -91,8 +91,8 @@ static int cpufreq_governor_dbs(struct cpufreq_policy *policy,
 #ifndef CONFIG_CPU_FREQ_DEFAULT_GOV_HYPER
 static
 #endif
-struct cpufreq_governor cpufreq_gov_HYPER = {
-       .name                   = "HYPER",
+struct cpufreq_governor cpufreq_gov_hyper = {
+       .name                   = "hyper",
        .governor               = cpufreq_governor_dbs,
        .max_transition_latency = TRANSITION_LATENCY_LIMIT,
        .owner                  = THIS_MODULE,
@@ -174,9 +174,9 @@ static struct dbs_tuners {
 static unsigned int dbs_enable=0;	/* number of CPUs using this policy */
 
 #ifdef SUSPEND_FREQ_ON
-// HYPER suspend mods (Thanks to Imoseyon)
+// hyper suspend mods (Thanks to Imoseyon)
 static unsigned int suspended = 0;
-static void HYPER_suspend(int suspend)
+static void hyper_suspend(int suspend)
 {
         struct cpu_dbs_info_s *dbs_info = &per_cpu(od_cpu_dbs_info, smp_processor_id());
         if (dbs_enable==0) return;
@@ -184,26 +184,26 @@ static void HYPER_suspend(int suspend)
                 suspended = 0;
                 __cpufreq_driver_target(dbs_info->cur_policy, dbs_info->cur_policy->max,
 			CPUFREQ_RELATION_L);
-                pr_info("[HYPER] HYPER awake at %d\n", dbs_info->cur_policy->cur);
+                pr_info("[hyper] hyper awake at %d\n", dbs_info->cur_policy->cur);
         } else {
                 suspended = 1;
 		// let's give it a little breathing room
                 __cpufreq_driver_target(dbs_info->cur_policy, dbs_tuners_ins.suspend_freq, CPUFREQ_RELATION_H);
-                pr_info("[HYPER] HYPER suspended at %d\n", dbs_info->cur_policy->cur);
+                pr_info("[hyper] hyper suspended at %d\n", dbs_info->cur_policy->cur);
         }
 }
 
 static void hyper__power_early_suspend(struct early_suspend *handler) {
-       HYPER_suspend(1);
+       hyper_suspend(1);
 }
 
 static void hyper__power_late_resume(struct early_suspend *handler) {
-       HYPER_suspend(0);
+       hyper_suspend(0);
 }
 
-static struct early_suspend HYPER_suspend = {
-        .suspend = HYPER_early_suspend,
-        .resume = HYPER_late_resume,
+static struct early_suspend hyper_suspend = {
+        .suspend = hyper_early_suspend,
+        .resume = hyper_late_resume,
         .level = EARLY_SUSPEND_LEVEL_DISABLE_FB + 1,
 };
 #endif
@@ -315,7 +315,7 @@ static void hyper__power_powersave_bias_init_cpu(int cpu)
 	dbs_info->freq_lo = 0;
 }
 
-static void HYPER_powersave_bias_init(void)
+static void hyper_powersave_bias_init(void)
 {
 	int i;
 	for_each_online_cpu(i) {
@@ -496,7 +496,7 @@ static ssize_t store_powersave_bias(struct kobject *a, struct attribute *b,
 		input = 1000;
 
 	dbs_tuners_ins.powersave_bias = input;
-	HYPER_powersave_bias_init();
+	hyper_powersave_bias_init();
 	return count;
 }
 
@@ -655,7 +655,7 @@ static struct attribute *dbs_attributes[] = {
 
 static struct attribute_group dbs_attr_group = {
 	.attrs = dbs_attributes,
-	.name = "HYPER",
+	.name = "hyper",
 };
 
 /************************** sysfs end ************************/
@@ -741,7 +741,7 @@ static void dbs_check_cpu(struct cpu_dbs_info_s *this_dbs_info)
 		}
 
 		/*
-		 * For the purpose of HYPER, waiting for disk IO is an
+		 * For the purpose of hyper, waiting for disk IO is an
 		 * indication that you're performance critical, and not that
 		 * the system is actually idle. So subtract the iowait time
 		 * from the cpu idle time.
@@ -925,25 +925,25 @@ static int should_io_be_busy(void)
 #ifdef CONFIG_HAS_EARLYSUSPEND
 #ifdef SUSPEND_FREQ_ON
 static struct early_suspend early_suspend;
-unsigned int prev_up_threshold_HYPER;
-unsigned int prev_freq_step_HYPER;
-unsigned int prev_sampling_rate_HYPER;
-static void cpufreq_HYPER_early_suspend(struct early_suspend *h)
+unsigned int prev_up_threshold_hyper;
+unsigned int prev_freq_step_hyper;
+unsigned int prev_sampling_rate_hyper;
+static void cpufreq_hyper_early_suspend(struct early_suspend *h)
 {
 	dbs_tuners_ins.early_suspend = 1;
-	prev_freq_step_HYPER = dbs_tuners_ins.freq_step;
-	prev_sampling_rate_HYPER = dbs_tuners_ins.sampling_rate;
-	prev_up_threshold_HYPER = dbs_tuners_ins.up_threshold;
+	prev_freq_step_hyper = dbs_tuners_ins.freq_step;
+	prev_sampling_rate_hyper = dbs_tuners_ins.sampling_rate;
+	prev_up_threshold_hyper = dbs_tuners_ins.up_threshold;
 	dbs_tuners_ins.freq_step = dbs_tuners_ins.freq_step_suspend;
 	dbs_tuners_ins.sampling_rate *= dbs_tuners_ins.sampling_factor_suspend;
 	dbs_tuners_ins.up_threshold = dbs_tuners_ins.up_threshold_suspend;
 }
-static void cpufreq_HYPER_late_resume(struct early_suspend *h)
+static void cpufreq_hyper_late_resume(struct early_suspend *h)
 {
 	dbs_tuners_ins.early_suspend = -1;
-	dbs_tuners_ins.freq_step = prev_freq_step_HYPER;
-	dbs_tuners_ins.sampling_rate = prev_sampling_rate_HYPER;
-	dbs_tuners_ins.up_threshold = prev_up_threshold_HYPER;
+	dbs_tuners_ins.freq_step = prev_freq_step_hyper;
+	dbs_tuners_ins.sampling_rate = prev_sampling_rate_hyper;
+	dbs_tuners_ins.up_threshold = prev_up_threshold_hyper;
 }
 #endif
 #endif
@@ -1014,7 +1014,7 @@ static int cpufreq_governor_dbs(struct cpufreq_policy *policy,
 #ifdef CONFIG_HAS_EARLYSUSPEND
 #ifdef SUSPEND_FREQ_ON
 		register_early_suspend(&early_suspend);
-		register_early_suspend(&HYPER_power_suspend);
+		register_early_suspend(&hyper_power_suspend);
 #endif
 #endif
 		break;
@@ -1023,7 +1023,7 @@ static int cpufreq_governor_dbs(struct cpufreq_policy *policy,
 #ifdef CONFIG_HAS_EARLYSUSPEND
 #ifdef SUSPEND_FREQ_ON
 		unregister_early_suspend(&early_suspend);
-		unregister_early_suspend(&HYPER_power_suspend);
+		unregister_early_suspend(&hyper_power_suspend);
 #endif
 #endif
 		dbs_timer_exit(this_dbs_info);
@@ -1078,23 +1078,23 @@ static int __init cpufreq_gov_dbs_init(void)
 #ifdef CONFIG_HAS_EARLYSUSPEND
 #ifdef SUSPEND_FREQ_ON
 	early_suspend.level = EARLY_SUSPEND_LEVEL_DISABLE_FB;
-	early_suspend.suspend = cpufreq_HYPER_early_suspend;
-	early_suspend.resume = cpufreq_HYPER_late_resume;
+	early_suspend.suspend = cpufreq_hyper_early_suspend;
+	early_suspend.resume = cpufreq_hyper_late_resume;
 #endif
 #endif
 
-	return cpufreq_register_governor(&cpufreq_gov_HYPER);
+	return cpufreq_register_governor(&cpufreq_gov_hyper);
 }
 
 static void __exit cpufreq_gov_dbs_exit(void)
 {
-	cpufreq_unregister_governor(&cpufreq_gov_HYPER);
+	cpufreq_unregister_governor(&cpufreq_gov_hyper);
 }
 
 MODULE_AUTHOR("Venkatesh Pallipadi <venkatesh.pallipadi@intel.com>");
 MODULE_AUTHOR("Alexey Starikovskiy <alexey.y.starikovskiy@intel.com>");
 MODULE_AUTHOR("Dorimanx <yuri@bynet.co.il>");
-MODULE_DESCRIPTION("'cpufreq_HYPER' - A dynamic cpufreq governor for "
+MODULE_DESCRIPTION("'cpufreq_hyper' - A dynamic cpufreq governor for "
 	"Low Latency Frequency Transition capable processors" 
 "Module include, IOWAIT,FREQ-TUNERS,EARLY-SUSPEND,SUSPEND-FREQ");
 MODULE_LICENSE("GPL");

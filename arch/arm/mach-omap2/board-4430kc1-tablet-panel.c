@@ -125,7 +125,7 @@ static struct spi_board_info tablet_spi_board_info[] __initdata = {
 	},
 };
 
-static void __init sdp4430_init_display_led(void)
+static void __init* sdp4430_init_display_led(void)
 {
 	twl_i2c_write_u8(TWL_MODULE_PWM, 0xFF, LED_PWM2ON);
 	twl_i2c_write_u8(TWL_MODULE_PWM, 0x7F, LED_PWM2OFF);

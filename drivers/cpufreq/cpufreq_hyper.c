@@ -54,12 +54,12 @@
 #define MIN_FREQUENCY_UP_THRESHOLD              (11)
 #define MAX_FREQUENCY_UP_THRESHOLD              (100)
 #define FREQ_STEP                               (35)
-#define UP_THRESHOLD_AT_MIN_FREQ                (40)
+#define UP_THRESHOLD_AT_MIN_FREQ                (600000)
 #define FREQ_FOR_RESPONSIVENESS                 (1008000)
 
 #ifdef CONFIG_HAS_EARLYSUSPEND
 #ifdef SUSPEND_FREQ_ON
-#define DEF_SUSPEND_FREQ			(1008000)
+#define DEF_SUSPEND_FREQ			(600000)
 #define FREQ_STEP_SUSPEND                       (40)
 #define SAMPLING_FACTOR_SUSPEND			(3)
 #define DEF_FREQUENCY_UP_THRESHOLD_SUSPEND	(95)
